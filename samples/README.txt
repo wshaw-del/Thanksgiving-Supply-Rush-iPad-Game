@@ -1,0 +1,1 @@
+Open index.html in a browser to test three independent 60-second sample puzzles. This does not replace the live GitHub multiplayer game. Three local color differences are used per scene as a gameplay prototype; final production artwork needs deliberate object edits and visual QA.
