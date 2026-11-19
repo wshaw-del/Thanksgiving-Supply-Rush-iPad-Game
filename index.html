@@ -8,10 +8,10 @@ main{max-width:1400px;margin:0 auto;padding:0 10px 16px}
 select,button{font:inherit;padding:10px 13px;border-radius:10px;border:1px solid #b3977c} select{background:#fff;color:#241813} button{background:#2f8d69;color:#fff;font-weight:700} button.secondary{background:#6b5244}
 .score{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#ffffff14;border:1px solid #ffffff2e;padding:10px 14px;border-radius:11px;margin-bottom:10px;font-weight:700}.count{color:#ffd694}
 .images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}.pane{min-width:0}.heading{text-align:center;font-size:14px;font-weight:800;letter-spacing:.04em;margin:0 0 5px}
-.frame{position:relative;border-radius:12px;overflow:hidden;border:2px solid #f1ce93;background:#2a211c;line-height:0}.frame img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.frame{touch-action:manipulation;position:relative;border-radius:12px;overflow:hidden;border:2px solid #f1ce93;background:#2a211c;line-height:0}.frame img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;pointer-events:none}
 .hotmarker{position:absolute;transform:translate(-50%,-50%);height:28px;width:28px;border:4px solid #62ee9c;border-radius:50%;box-shadow:0 0 0 2px #151715,0 0 12px #4ce783;pointer-events:none}
 .footer{text-align:center;font-size:13px;color:#e6d3c2;margin-top:10px}.reward{color:#ffe3aa;font-weight:800}
-@media(max-width:850px){.images{grid-template-columns:1fr}}
+@media(max-width:570px){.images{grid-template-columns:1fr}}
 </style></head><body>
 <header><h1>Spot the Difference – 3 Approved Samples</h1><p>Find all <strong>3 differences</strong> in 60 seconds. No hints. No answer reveal.</p></header>
 <main>
@@ -33,33 +33,56 @@ select,button{font:inherit;padding:10px 13px;border-radius:10px;border:1px solid
 <div class='footer'>This is a standalone iPad test. <span class='reward'>Solo reward:</span> 1 random ingredient.</div>
 </main>
 <script>
-const puzzles=[
-{title:'Thanksgiving',a:'p0a.jpg',b:'p0b.jpg',targets:[
-{x:.116,y:.46,rx:.095,ry:.14},
-{x:.595,y:.655,rx:.075,ry:.082},
-{x:.63,y:.802,rx:.090,ry:.092}
-]},
-{title:'City of Mobile',a:'p1a.jpg',b:'p1b.jpg',targets:[
-{x:.87,y:.25,rx:.11,ry:.06},
-{x:.40,y:.71,rx:.05,ry:.06},
-{x:.82,y:.41,rx:.10,ry:.09}
-]},
-{title:'Digital Forensics Lab',a:'p2a.jpg',b:'p2b.jpg',targets:[
-{x:.435,y:.665,rx:.05,ry:.06},
-{x:.59,y:.71,rx:.055,ry:.06},
-{x:.33,y:.615,rx:.055,ry:.055}
-]}];
-let active=0, found=[], timer=null, remaining=60, running=false;
-const sel=document.getElementById('puzzle'), startBtn=document.getElementById('start'), resetBtn=document.getElementById('reset');
-const imgA=document.getElementById('imgA'), imgB=document.getElementById('imgB'); const frameA=imgA.parentElement, frameB=imgB.parentElement; const timeEl=document.getElementById('time'), foundEl=document.getElementById('found'), statusEl=document.getElementById('status');
-function loadPuzzle(){ const p=puzzles[active]; imgA.src=p.a; imgB.src=p.b; clearMarkers(); found=[]; updateFound(); remaining=60; timeEl.textContent=remaining; running=false; statusEl.textContent='Tap the matching differences in either image.'; }
+'use strict';
+const puzzles = [
+ {title:'Thanksgiving',a:'p0a.jpg',b:'p0b.jpg',targets:[
+  {x:.116,y:.46,rx:.095,ry:.14},
+  {x:.595,y:.655,rx:.075,ry:.082},
+  {x:.63,y:.802,rx:.090,ry:.092}]},
+ {title:'City of Mobile',a:'p1a.jpg',b:'p1b.jpg',targets:[
+  {x:.857,y:.250,rx:.105,ry:.045}, // street sign (Royal / Dauphin)
+  {x:.342,y:.742,rx:.045,ry:.100}, // hydrant (yellow / silver)
+  {x:.893,y:.390,rx:.065,ry:.064}  // changed parade mask/feathers
+ ]},
+ {title:'Digital Forensics Lab',a:'p2a.jpg',b:'p2b.jpg',targets:[
+  {x:.455,y:.640,rx:.048,ry:.055}, // yellow evidence marker (3/5)
+  {x:.548,y:.676,rx:.055,ry:.047}, // phone (black/white)
+  {x:.341,y:.620,rx:.052,ry:.040}  // portable drive/USB accessory
+ ]}
+];
+let active=0, found=new Set(),timer=null,remaining=60,running=false;
+const $=id=>document.getElementById(id);
+const sel=$('puzzle'), imgA=$('imgA'), imgB=$('imgB');
+const frameA=imgA.parentElement, frameB=imgB.parentElement;
+const timeEl=$('time'), foundEl=$('found'),statusEl=$('status');
+function clearTimer(){if(timer!==null){clearInterval(timer);timer=null;}}
 function clearMarkers(){document.querySelectorAll('.hotmarker').forEach(n=>n.remove());}
-function updateFound(){foundEl.textContent=`${found.length} / 3`;}
+function updateFound(){foundEl.textContent=found.size+' / 3';}
+function loadPuzzle(){clearTimer();running=false;found.clear();clearMarkers();active=Number(sel.value);const p=puzzles[active];imgA.src=p.a;imgB.src=p.b;remaining=60;timeEl.textContent='60';updateFound();statusEl.textContent='Tap the matching differences in either image.';}
 function addMarker(frame,t){const m=document.createElement('div');m.className='hotmarker';m.style.left=(t.x*100)+'%';m.style.top=(t.y*100)+'%';frame.appendChild(m);}
-function hitTarget(normX,normY){const targets=puzzles[active].targets; for(let i=0;i<targets.length;i++){ if(found.includes(i)) continue; const t=targets[i]; if(Math.abs(normX-t.x)<=t.rx && Math.abs(normY-t.y)<=t.ry){ found.push(i); addMarker(frameA,t); addMarker(frameB,t); updateFound(); if(found.length===3){ running=false; clearInterval(timer); statusEl.textContent='Success! All 3 found.'; } return true; } } return false; }
-function normalizedFromEvent(ev,img){ const rect=img.getBoundingClientRect(); const pt=(ev.touches&&ev.touches[0])||ev; return {x:(pt.clientX-rect.left)/rect.width,y:(pt.clientY-rect.top)/rect.height}; }
-function handleTap(ev,img){ if(!running) return; const n=normalizedFromEvent(ev,img); if(n.x<0||n.y<0||n.x>1||n.y>1) return; hitTarget(n.x,n.y); ev.preventDefault(); }
-['click','touchstart'].forEach(type=>{ imgA.addEventListener(type,e=>handleTap(e,imgA), {passive:false}); imgB.addEventListener(type,e=>handleTap(e,imgB), {passive:false}); });
-function start(){ clearInterval(timer); clearMarkers(); found=[]; updateFound(); remaining=60; timeEl.textContent=remaining; running=true; statusEl.textContent='Game in progress…'; timer=setInterval(()=>{ remaining--; timeEl.textContent=remaining; if(remaining<=0){ clearInterval(timer); running=false; statusEl.textContent=found.length===3?'Success! All 3 found.':'Time's up! No answer reveal.'; } },1000);} 
-sel.addEventListener('change',()=>{active=+sel.value; loadPuzzle();}); startBtn.addEventListener('click',start); resetBtn.addEventListener('click',loadPuzzle); loadPuzzle();
+function handleTap(ev,img){
+ if(!running)return;
+ const rect=img.getBoundingClientRect();
+ if(rect.width===0||rect.height===0)return;
+ const x=(ev.clientX-rect.left)/rect.width,y=(ev.clientY-rect.top)/rect.height;
+ if(x<0||x>1||y<0||y>1)return;
+ const targets=puzzles[active].targets;
+ for(let i=0;i<targets.length;i++){
+  if(found.has(i))continue;
+  const t=targets[i];
+  if(Math.abs(x-t.x)<=t.rx && Math.abs(y-t.y)<=t.ry){
+   found.add(i);addMarker(frameA,t);addMarker(frameB,t);updateFound();
+   if(found.size===3){running=false;clearTimer();statusEl.textContent='Success! All 3 found.';}
+   ev.preventDefault();return;
+  }
+ }
+}
+// Events belong on the frame, not the image; the image is intentionally noninteractive.
+frameA.addEventListener('pointerdown',ev=>handleTap(ev,imgA));
+frameB.addEventListener('pointerdown',ev=>handleTap(ev,imgB));
+function start(){clearTimer();found.clear();clearMarkers();updateFound();remaining=60;timeEl.textContent='60';running=true;statusEl.textContent='Game in progress…';timer=setInterval(()=>{if(!running)return;remaining--;timeEl.textContent=String(remaining);if(remaining<=0){running=false;clearTimer();statusEl.textContent="Time's up! No answer reveal.";}},1000);}
+sel.addEventListener('change',loadPuzzle);
+$('start').addEventListener('click',start);
+$('reset').addEventListener('click',loadPuzzle);
+loadPuzzle();
 </script></body></html>
