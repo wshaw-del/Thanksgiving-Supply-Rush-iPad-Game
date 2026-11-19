@@ -1,88 +1,17 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Spot the Difference – Approved Samples</title>
-<style>
-:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#fff;background:#241813}
-*{box-sizing:border-box} body{margin:0;min-height:100vh;background:linear-gradient(160deg,#5b3828,#241813 60%)}
-header{padding:12px 12px 6px;text-align:center} h1{margin:0;font-size:clamp(20px,4vw,30px)} p{margin:4px 0 0;color:#e7d2be}
-main{max-width:1400px;margin:0 auto;padding:0 10px 16px}
-.bar{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}.bar label{font-weight:700}
-select,button{font:inherit;padding:10px 13px;border-radius:10px;border:1px solid #b3977c} select{background:#fff;color:#241813} button{background:#2f8d69;color:#fff;font-weight:700} button.secondary{background:#6b5244}
-.score{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#ffffff14;border:1px solid #ffffff2e;padding:10px 14px;border-radius:11px;margin-bottom:10px;font-weight:700}.count{color:#ffd694}
-.images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}.pane{min-width:0}.heading{text-align:center;font-size:14px;font-weight:800;letter-spacing:.04em;margin:0 0 5px}
-.frame{touch-action:manipulation;position:relative;border-radius:12px;overflow:hidden;border:2px solid #f1ce93;background:#2a211c;line-height:0}.frame img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;pointer-events:none}
-.hotmarker{position:absolute;transform:translate(-50%,-50%);height:28px;width:28px;border:4px solid #62ee9c;border-radius:50%;box-shadow:0 0 0 2px #151715,0 0 12px #4ce783;pointer-events:none}
-.footer{text-align:center;font-size:13px;color:#e6d3c2;margin-top:10px}.reward{color:#ffe3aa;font-weight:800}
-@media(max-width:570px){.images{grid-template-columns:1fr}}
-</style></head><body>
-<header><h1>Spot the Difference – 3 Approved Samples</h1><p>Find all <strong>3 differences</strong> in 60 seconds. No hints. No answer reveal.</p></header>
-<main>
-<div class='bar'>
-<label for='puzzle'>Puzzle:</label>
-<select id='puzzle'>
-<option value='0'>Thanksgiving</option>
-<option value='1'>City of Mobile</option>
-<option value='2'>Digital Forensics Lab</option>
-</select>
-<button id='start'>Start 60-Second Sample</button>
-<button id='reset' class='secondary'>Reset</button>
-</div>
-<div class='score'><div>Time: <span id='time' class='count'>60</span>s</div><div>Found: <span id='found' class='count'>0 / 3</span></div><div id='status'>Tap the matching differences in either image.</div></div>
-<div class='images'>
-<div class='pane'><div class='heading'>Image A</div><div class='frame'><img id='imgA' alt='Image A'></div></div>
-<div class='pane'><div class='heading'>Image B</div><div class='frame'><img id='imgB' alt='Image B'></div></div>
-</div>
-<div class='footer'>This is a standalone iPad test. <span class='reward'>Solo reward:</span> 1 random ingredient.</div>
-</main>
-<script>
-'use strict';
-const puzzles = [
- {title:'Thanksgiving',a:'p0a.jpg',b:'p0b.jpg',targets:[
-  {x:.116,y:.46,rx:.095,ry:.14},
-  {x:.595,y:.655,rx:.075,ry:.082},
-  {x:.63,y:.802,rx:.090,ry:.092}]},
- {title:'City of Mobile',a:'p1a.jpg',b:'p1b.jpg',targets:[
-  {x:.857,y:.250,rx:.105,ry:.045}, // street sign (Royal / Dauphin)
-  {x:.342,y:.742,rx:.045,ry:.100}, // hydrant (yellow / silver)
-  {x:.893,y:.390,rx:.065,ry:.064}  // changed parade mask/feathers
- ]},
- {title:'Digital Forensics Lab',a:'p2a.jpg',b:'p2b.jpg',targets:[
-  {x:.455,y:.640,rx:.048,ry:.055}, // yellow evidence marker (3/5)
-  {x:.548,y:.676,rx:.055,ry:.047}, // phone (black/white)
-  {x:.341,y:.620,rx:.052,ry:.040}  // portable drive/USB accessory
- ]}
-];
-let active=0, found=new Set(),timer=null,remaining=60,running=false;
-const $=id=>document.getElementById(id);
-const sel=$('puzzle'), imgA=$('imgA'), imgB=$('imgB');
-const frameA=imgA.parentElement, frameB=imgB.parentElement;
-const timeEl=$('time'), foundEl=$('found'),statusEl=$('status');
-function clearTimer(){if(timer!==null){clearInterval(timer);timer=null;}}
-function clearMarkers(){document.querySelectorAll('.hotmarker').forEach(n=>n.remove());}
-function updateFound(){foundEl.textContent=found.size+' / 3';}
-function loadPuzzle(){clearTimer();running=false;found.clear();clearMarkers();active=Number(sel.value);const p=puzzles[active];imgA.src=p.a;imgB.src=p.b;remaining=60;timeEl.textContent='60';updateFound();statusEl.textContent='Tap the matching differences in either image.';}
-function addMarker(frame,t){const m=document.createElement('div');m.className='hotmarker';m.style.left=(t.x*100)+'%';m.style.top=(t.y*100)+'%';frame.appendChild(m);}
-function handleTap(ev,img){
- if(!running)return;
- const rect=img.getBoundingClientRect();
- if(rect.width===0||rect.height===0)return;
- const x=(ev.clientX-rect.left)/rect.width,y=(ev.clientY-rect.top)/rect.height;
- if(x<0||x>1||y<0||y>1)return;
- const targets=puzzles[active].targets;
- for(let i=0;i<targets.length;i++){
-  if(found.has(i))continue;
-  const t=targets[i];
-  if(Math.abs(x-t.x)<=t.rx && Math.abs(y-t.y)<=t.ry){
-   found.add(i);addMarker(frameA,t);addMarker(frameB,t);updateFound();
-   if(found.size===3){running=false;clearTimer();statusEl.textContent='Success! All 3 found.';}
-   ev.preventDefault();return;
-  }
- }
-}
-// Events belong on the frame, not the image; the image is intentionally noninteractive.
-frameA.addEventListener('pointerdown',ev=>handleTap(ev,imgA));
-frameB.addEventListener('pointerdown',ev=>handleTap(ev,imgB));
-function start(){clearTimer();found.clear();clearMarkers();updateFound();remaining=60;timeEl.textContent='60';running=true;statusEl.textContent='Game in progress…';timer=setInterval(()=>{if(!running)return;remaining--;timeEl.textContent=String(remaining);if(remaining<=0){running=false;clearTimer();statusEl.textContent="Time's up! No answer reveal.";}},1000);}
-sel.addEventListener('change',loadPuzzle);
-$('start').addEventListener('click',start);
-$('reset').addEventListener('click',loadPuzzle);
-loadPuzzle();
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Thanksgiving Supply Rush • Batch 1</title><style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}*{box-sizing:border-box}body{margin:0;background:#241b16;color:#fff}header{text-align:center;background:#503629;padding:12px 10px}h1{font-size:clamp(20px,3vw,29px);margin:0}header p{margin:3px;color:#f1ddc1;font-size:13px}main{max-width:1500px;margin:auto;padding:12px}.controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center;justify-content:center;margin-bottom:12px}button,select{font:inherit;font-size:16px;padding:11px 13px;border-radius:9px;border:1px solid #ac927d;min-height:44px}button{background:#287653;color:#fff;font-weight:700;cursor:pointer}button.secondary{background:#654938}select{background:#fff;color:#222;max-width:90vw}.stats{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:#ffffff17;border-radius:10px;margin:0 0 12px;font-weight:700}.stats strong{color:#ffd292;font-variant-numeric:tabular-nums}.photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}.scene{min-width:0}.scene h2{margin:0 0 6px;font-size:14px;text-align:center}.image-frame{position:relative;width:100%;border:2px solid #e8c590;border-radius:9px;overflow:hidden;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.image-frame img{display:block;width:100%;height:auto;pointer-events:none;user-select:none;-webkit-user-drag:none}.hit-circle{position:absolute;width:28px;height:28px;transform:translate(-50%,-50%);border:4px solid #57eb92;border-radius:50%;box-shadow:0 0 0 2px #142c22,0 0 12px #38b976;pointer-events:none}.notice{margin-top:12px;text-align:center;font-size:13px;color:#e9d5bf}#status{flex:1;text-align:center} @media(max-width:600px){main{padding:8px}.photos{gap:6px}.stats{padding:8px 7px;font-size:13px}.controls{gap:6px}.scene h2{font-size:12px}.hit-circle{width:22px;height:22px}}@media(orientation:landscape) and (max-height:650px){header{padding:5px}header p{display:none}main{padding-top:5px}.controls{margin-bottom:5px}.stats{padding:5px;margin-bottom:5px}.scene h2{margin-bottom:2px}}
+</style></head><body><header><h1>Thanksgiving Supply Rush — Spot the Difference</h1><p>Batch 1 test • 5 realistic Thanksgiving puzzles • 60 seconds each • 3 differences</p></header><main><div class="controls"><label for="puzzle">Puzzle</label><select id="puzzle"></select><button id="start">Start 60-Second Round</button><button id="reset" class="secondary">Reset</button></div><div class="stats"><span>Time: <strong id="seconds">60</strong>s</span><span>Found: <strong id="count">0/3</strong></span><span id="status">Choose a puzzle and press Start</span></div><div class="photos"><section class="scene"><h2>IMAGE A</h2><div id="paneA" class="image-frame"><img id="imageA" alt="First Thanksgiving scene"></div></section><section class="scene"><h2>IMAGE B</h2><div id="paneB" class="image-frame"><img id="imageB" alt="Second Thanksgiving scene"></div></section></div><p class="notice">Tap either picture where you see a difference. No hints or answer reveals. This test does not change your main multiplayer game.</p></main><script>
+const PUZZLES=[{"name":"Thanksgiving Dining Room","a":"p01a.png","b":"p01b.png","targets":[{"x":0.73923,"y":0.0949,"r":0.05183},{"x":0.11802,"y":0.41707,"r":0.063},{"x":0.61404,"y":0.70096,"r":0.05104}]},{"name":"Thanksgiving Kitchen","a":"p02a.png","b":"p02b.png","targets":[{"x":0.9067,"y":0.07097,"r":0.04785},{"x":0.47927,"y":0.49761,"r":0.05662},{"x":0.85167,"y":0.6874,"r":0.06938}]},{"name":"Thanksgiving Buffet","a":"p03a.png","b":"p03b.png","targets":[{"x":0.14354,"y":0.80622,"r":0.05662},{"x":0.85965,"y":0.70016,"r":0.03748},{"x":0.94498,"y":0.73365,"r":0.03589}]},{"name":"Thanksgiving Living Room","a":"p04a.png","b":"p04b.png","targets":[{"x":0.90989,"y":0.0949,"r":0.05502},{"x":0.23525,"y":0.67943,"r":0.05582},{"x":0.79346,"y":0.89075,"r":0.05981}]},{"name":"Thanksgiving Porch","a":"p05a.png","b":"p05b.png","targets":[{"x":0.36443,"y":0.17703,"r":0.06539},{"x":0.85008,"y":0.13238,"r":0.05183},{"x":0.92185,"y":0.51754,"r":0.05901}]}];
+const el=id=>document.getElementById(id);const select=el('puzzle'),images=[el('imageA'),el('imageB')],panes=[el('paneA'),el('paneB')];
+let round=0,found=new Set(),running=false,deadline=0,timer=null;
+for(let i=0;i<PUZZLES.length;i++){const opt=document.createElement('option');opt.value=i;opt.textContent=`${i+1}. ${PUZZLES[i].name}`;select.append(opt)}
+function clearTimer(){if(timer)clearInterval(timer);timer=null}
+function markersClear(){panes.forEach(p=>p.querySelectorAll('.hit-circle').forEach(m=>m.remove()))}
+function showPuzzle(){clearTimer();running=false;found.clear();markersClear();const p=PUZZLES[round];images[0].src=p.a;images[1].src=p.b;el('seconds').textContent='60';el('count').textContent='0/3';el('status').textContent='Press Start to begin'}
+function addMarker(t){panes.forEach(p=>{const m=document.createElement('span');m.className='hit-circle';m.style.left=`${t.x*100}%`;m.style.top=`${t.y*100}%`;p.append(m)})}
+function tick(){const left=Math.max(0,Math.ceil((deadline-performance.now())/1000));el('seconds').textContent=String(left);if(left===0){running=false;clearTimer();el('status').textContent=`Time’s up — ${found.size} of 3 found`;}}
+function start(){clearTimer();found.clear();markersClear();running=true;deadline=performance.now()+60000;el('count').textContent='0/3';el('status').textContent='Find three differences';tick();timer=setInterval(tick,100)}
+function tryTap(e,i){if(!running)return;const r=images[i].getBoundingClientRect();let x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;if(x<0||x>1||y<0||y>1)return;let p=PUZZLES[round],nearest=-1,best=Infinity;for(let j=0;j<p.targets.length;j++){if(found.has(j))continue;const t=p.targets[j],d=Math.hypot(x-t.x,y-t.y);if(d<=t.r&&d<best){best=d;nearest=j}}if(nearest!==-1){found.add(nearest);addMarker(p.targets[nearest]);el('count').textContent=`${found.size}/3`;if(found.size===3){running=false;clearTimer();el('status').textContent='Completed! All three found.';}}}
+panes.forEach((pane,i)=>pane.addEventListener('pointerdown',e=>tryTap(e,i)));
+select.addEventListener('change',()=>{round=Number(select.value);showPuzzle()});el('start').addEventListener('click',start);el('reset').addEventListener('click',showPuzzle);showPuzzle();
 </script></body></html>
