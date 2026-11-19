@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#533121"><title>Thanksgiving Supply Rush | Approved Art Test</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#533121"><title>Thanksgiving Supply Rush | New Square Image Test</title>
 <style>
 :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#fff;background:#251a16}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(160deg,#533121,#251a16 56%)}header{padding:12px 16px;text-align:center}h1{font-size:clamp(19px,2.6vw,30px);margin:0 0 2px;line-height:1.1}header p{margin:2px 0;color:#e4cdb5;font-size:13px}main{width:min(1500px,100%);padding:0 10px 16px;margin:auto}.bar{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;align-items:center;margin:6px 0 9px}.bar label{font-weight:700}select,button{font:inherit;border-radius:9px;padding:10px 13px;border:1px solid #aa9075}select{background:#fff;color:#241b17;max-width:100%}button{background:#2c8b66;color:white;cursor:pointer;font-weight:700}button.secondary{background:#6c503e}button:disabled{opacity:.55;cursor:default}.score{display:flex;justify-content:space-between;gap:12px;align-items:center;background:#fff1;border:1px solid #ffffff33;border-radius:10px;padding:10px 14px;margin:0 0 9px;font-size:clamp(14px,2vw,22px);font-weight:700}.score .count{font-variant-numeric:tabular-nums;color:#ffd38c}.images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}.pane{min-width:0}.imagebox{position:relative;width:100%;line-height:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.imagebox img{width:100%;height:auto;display:block}.imagebox .hotmarker{position:absolute;z-index:2}.pane .heading{text-align:center;font-size:14px;font-weight:800;letter-spacing:.03em;margin:0 0 4px}.frame{position:relative;border-radius:9px;overflow:hidden;border:2px solid #f3cd8c;background:#2b231e;line-height:0}.frame img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;pointer-events:none}.hotmarker{position:absolute;transform:translate(-50%,-50%);height:28px;width:28px;border:4px solid #62ee9c;border-radius:50%;box-shadow:0 0 0 2px #151715,0 0 12px #4ce783;pointer-events:none}.images.large{grid-template-columns:minmax(0,1fr);max-width:1220px;margin:0 auto}.images.large .frame{max-width:100%}.footer{text-align:center;color:#e8d7c8;font-size:13px;margin:11px auto;line-height:1.35}.reward{color:#ffe3aa;font-weight:800}.status{font-size:16px}.hidden{display:none}@media(max-width:700px){.images{grid-template-columns:1fr}.bar{gap:6px}.score{padding:7px 9px}header{padding:9px 4px}.footer{font-size:12px}}@media(orientation:landscape) and (max-height:630px){header{padding:5px 8px}header p{display:none}.bar{margin:3px 0 6px}.score{padding:5px 10px;margin:0 0 6px}.footer{margin:6px 0}}
-</style></head><body><header><h1>Thanksgiving Supply Rush — Spot the Difference</h1><p>Three realistic artwork samples • Test only • No room code needed</p></header><main>
+</style></head><body><header><h1>Thanksgiving Supply Rush — Spot the Difference</h1><p>Three square artwork samples • Test only • No room code needed</p></header><main>
 <div class="bar"><label for="puzzle">Theme</label><select id="puzzle"><option value="0">Thanksgiving Dinner</option><option value="1">City of Mobile — Mardi Gras</option><option value="2">Digital Forensics Lab</option></select><button id="start">Start 60-second round</button><button id="reset" class="secondary">Reset</button><button id="layout" class="secondary" type="button">Larger pictures</button></div>
 <div class="score"><span id="timer" class="count" aria-live="polite">60 seconds</span><span id="status" class="status" aria-live="polite">Press Start</span><span id="progress" class="count">0 / 3 found</span></div>
 <div class="images" id="pictures"><section class="pane"><div class="heading">PICTURE A</div><div class="frame" id="frameA"><div class="imagebox" id="boxA"><img id="imgA" alt="Picture A" draggable="false"></div></div></section><section class="pane"><div class="heading">PICTURE B</div><div class="frame" id="frameB"><div class="imagebox" id="boxB"><img id="imgB" alt="Picture B" draggable="false"></div></div></section></div>
-<p class="footer">The Mobile and Forensics pictures are panorama originals, so they open in larger stacked view for more accurate touch control. Tap <b>Side-by-side pictures</b> to compare both at once. Tap each difference in either picture. No hints or answer key. <span class="reward">Success within 60 seconds = 1 random ingredient (solo test rule).</span><br>For the event, the head-to-head winner earns 2 random ingredients. This page does not connect the iPads.</p>
+<p class="footer">All individual pictures are square. Use <b>Larger pictures</b> if you prefer a stacked view. Tap each difference in either picture. No hints or answer key. <span class="reward">Success within 60 seconds = 1 random ingredient (solo test rule).</span><br>For the event, the head-to-head winner earns 2 random ingredients. This page does not connect the iPads.</p>
 </main>
 <script>
 'use strict';
@@ -18,18 +18,18 @@ const puzzles=[
 {x:.63,y:.802,rx:.090,ry:.092} // pumpkin/apple
 ]},
 {name:'City of Mobile — Mardi Gras',a:'p1a.jpg',b:'p1b.jpg',spots:[
-{x:.122,y:.125,rx:.065,ry:.102}, // street sign
-{x:.151,y:.45,rx:.071,ry:.19}, // balloons
-{x:.813,y:.227,rx:.100,ry:.152} // balcony bunting
+{x:.190,y:.248,rx:.115,ry:.073}, // Dauphin Street versus Royal Street sign
+{x:.022,y:.452,rx:.044,ry:.073}, // one balloon removed at left
+{x:.940,y:.730,rx:.085,ry:.094} // cafe chalkboard wording
 ]},
 {name:'Digital Forensics Lab',a:'p2a.jpg',b:'p2b.jpg',spots:[
-{x:.249,y:.755,rx:.038,ry:.138}, // evidence marker
-{x:.397,y:.654,rx:.047,ry:.191}, // tumbler/mug
-{x:.322,y:.785,rx:.047,ry:.086} // external drive
+{x:.163,y:.780,rx:.102,ry:.126}, // evidence marker 12 to 13
+{x:.585,y:.625,rx:.095,ry:.095}, // center phone silver to purple
+{x:.639,y:.803,rx:.104,ry:.050} // case handle changes color
 ]}];
 const $=id=>document.getElementById(id);let running=false,done=new Set(),until=0,interval=null;
 let layoutOverride=null;
-function layout(){const wide=+$('puzzle').value!==0;const large=layoutOverride===null?wide:layoutOverride; // panoramas need enough height for precise iPad taps
+function layout(){const large=layoutOverride===null?false:layoutOverride; // all three have square source images
   $('pictures').classList.toggle('large',large);$('layout').textContent=large?'Side-by-side pictures':'Larger pictures';
 }
 $('layout').addEventListener('click',()=>{layoutOverride=!$('pictures').classList.contains('large');layout()});
