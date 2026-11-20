@@ -1,0 +1,61 @@
+name: Restore 75-puzzle game to repository root
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/restore-game-files.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Validate archive and restore playable game
+        run: |
+          python3 - <<'PY'
+          import zipfile, json, shutil
+          from pathlib import Path
+          archive = Path('Thanksgiving_Supply_Rush_Upload_This_One_Zip.zip')
+          if not archive.is_file():
+              raise SystemExit('Missing game archive')
+          with zipfile.ZipFile(archive) as z:
+              if z.testzip() is not None:
+                  raise SystemExit('ZIP integrity failure')
+              names = set(z.namelist())
+              needed = {'index.html', 'puzzles.json'} | {'puzzles/p%02d%s.jpg' % (i,s) for i in range(1,76) for s in 'ab'}
+              if not needed.issubset(names):
+                  raise SystemExit('Missing game file(s): ' + repr(sorted(needed - names)[:5]))
+              catalog = json.loads(z.read('puzzles.json'))
+              themes = {x['theme'] for x in catalog}
+              if len(catalog) != 75 or themes != {'Thanksgiving','City of Mobile','Digital Forensics'}:
+                  raise SystemExit('Puzzle catalog is invalid: ' + repr((len(catalog), themes)))
+              html = z.read('index.html')
+              if b'Create room' not in html or b'puzzles.json' not in html:
+                  raise SystemExit('Main game does not contain expected multiplayer interface')
+              Path('index.html').write_bytes(html)
+              Path('puzzles.json').write_bytes(z.read('puzzles.json'))
+              Path('puzzles').mkdir(exist_ok=True)
+              for name in sorted(needed):
+                  if name.startswith('puzzles/'):
+                      Path(name).write_bytes(z.read(name))
+          print('Restored multiplayer main page, three categories, and 150 images.')
+          PY
+      - name: Commit restored site files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f index.html puzzles.json puzzles/
+          if git diff --cached --quiet; then
+            echo 'No changes to commit.'
+          else
+            git commit -m 'Restore complete multiplayer game with 75 three-theme puzzles'
+            git push origin HEAD:main
+          fi
