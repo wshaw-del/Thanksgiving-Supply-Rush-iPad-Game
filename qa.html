@@ -23,5 +23,5 @@ for(const side of ['A','B'])e('board'+side).addEventListener('pointerdown',event
 e('show').addEventListener('change',render);e('reset').addEventListener('click',()=>{found.clear();render();line('Tap marks reset.')});
 for(const dir of [-1,1])e(dir===-1?'prev':'next').addEventListener('click',()=>{if(!cur||!visible.length)return;const i=visible.findIndex(p=>p.id===cur.id),p=visible[(i+dir+visible.length)%visible.length];e('select').value=p.id;load(p)});
 e('theme').addEventListener('change',()=>choose(cur?.id));e('select').addEventListener('change',()=>load(data.find(p=>p.id===Number(e('select').value))));
-fetch('puzzles.json?audit=20261120-sixfix').then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(d=>{if(d.length!==75)throw Error('Catalog does not contain 75');data=d;choose(Number.isInteger(wanted)&&wanted>=1&&wanted<=75?wanted-1:0)}).catch(err=>{e('name').textContent='Catalog could not load';line(String(err))});
+fetch('puzzles.json?audit=20261120-p54mug').then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(d=>{if(d.length!==75)throw Error('Catalog does not contain 75');data=d;choose(Number.isInteger(wanted)&&wanted>=1&&wanted<=75?wanted-1:0)}).catch(err=>{e('name').textContent='Catalog could not load';line(String(err))});
 </script></body></html>
