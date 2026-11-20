@@ -1,0 +1,61 @@
+name: Deploy Thanksgiving Supply Rush (75 puzzles)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Thanksgiving_Supply_Rush_Upload_This_One_Zip.zip'
+      - '.github/workflows/deploy-thanksgiving-game.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "thanksgiving-pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Extract and validate game package
+        run: |
+          python3 - <<'PY'
+          import os, zipfile
+          from pathlib import Path
+          archive = Path("Thanksgiving_Supply_Rush_Upload_This_One_Zip.zip")
+          if not archive.exists():
+              raise SystemExit("Please upload Thanksgiving_Supply_Rush_Upload_This_One_Zip.zip to the repository root.")
+          dest = Path("_site")
+          dest.mkdir(exist_ok=True)
+          with zipfile.ZipFile(archive) as z:
+              names = z.namelist()
+              if z.testzip():
+                  raise SystemExit("ZIP integrity check failed.")
+              for name in names:
+                  path = Path(name)
+                  if path.is_absolute() or '..' in path.parts:
+                      raise SystemExit("Unsafe ZIP entry: " + name)
+              z.extractall(dest)
+          images = list((dest / "puzzles").glob("p??[ab].jpg"))
+          if len(images) != 150 or not (dest / 'index.html').exists() or not (dest / 'puzzles.json').exists():
+              raise SystemExit("Archive must contain index.html, puzzles.json and exactly 150 puzzle images.")
+          print("Validated: 150 puzzle images; game HTML and puzzle catalog present.")
+          PY
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Deploy website
+        id: deploy
+        uses: actions/deploy-pages@v4
