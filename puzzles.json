@@ -775,19 +775,19 @@
     "b": "puzzles/p33b.jpg",
     "targets": [
       {
-        "x": 0.69,
-        "y": 0.38,
-        "r": 0.08
-      },
-      {
-        "x": 0.22,
-        "y": 0.74,
+        "x": 0.108,
+        "y": 0.416,
         "r": 0.09
       },
       {
-        "x": 0.42,
-        "y": 0.49,
-        "r": 0.08
+        "x": 0.236,
+        "y": 0.577,
+        "r": 0.095
+      },
+      {
+        "x": 0.166,
+        "y": 0.711,
+        "r": 0.088
       }
     ]
   },
@@ -1082,7 +1082,7 @@
   {
     "id": 45,
     "theme": "City of Mobile",
-    "title": "46. Mobile Mysticks \u2014 Hockey Game",
+    "title": "46. Mobile Mysticks — Hockey Game",
     "a": "puzzles/p46a.jpg",
     "b": "puzzles/p46b.jpg",
     "targets": [
@@ -1106,7 +1106,7 @@
   {
     "id": 46,
     "theme": "City of Mobile",
-    "title": "47. Mobile Mysticks \u2014 Rink-side Bench",
+    "title": "47. Mobile Mysticks — Rink-side Bench",
     "a": "puzzles/p47a.jpg",
     "b": "puzzles/p47b.jpg",
     "targets": [
@@ -1130,7 +1130,7 @@
   {
     "id": 47,
     "theme": "City of Mobile",
-    "title": "48. Mobile BayBears \u2014 Baseball Game",
+    "title": "48. Mobile BayBears — Baseball Game",
     "a": "puzzles/p48a.jpg",
     "b": "puzzles/p48b.jpg",
     "targets": [
@@ -1154,7 +1154,7 @@
   {
     "id": 48,
     "theme": "City of Mobile",
-    "title": "49. Mobile BayBears \u2014 Stadium Concourse",
+    "title": "49. Mobile BayBears — Stadium Concourse",
     "a": "puzzles/p49a.jpg",
     "b": "puzzles/p49b.jpg",
     "targets": [
@@ -1178,7 +1178,7 @@
   {
     "id": 49,
     "theme": "City of Mobile",
-    "title": "50. Buick Building \u2014 St. Louis Street",
+    "title": "50. Buick Building — St. Louis Street",
     "a": "puzzles/p50a.jpg",
     "b": "puzzles/p50b.jpg",
     "targets": [
