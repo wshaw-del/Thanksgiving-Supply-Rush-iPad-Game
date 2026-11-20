@@ -1,0 +1,73 @@
+name: Repair Downtown Mobile Cafe puzzle (p31)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/repair-cafe-p31.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Install image library
+        run: python3 -m pip install Pillow==11.3.0
+      - name: Restore third distinct object difference and touch targets
+        run: |
+          python3 - <<'PY'
+          import colorsys, json
+          from pathlib import Path
+          from PIL import Image, ImageFilter
+          file = Path('puzzles/p31b.jpg')
+          image = Image.open(file).convert('RGB')
+          assert image.size == (887, 887), image.size
+          changed = image.copy()
+          mask = Image.new('L', image.size, 0)
+          pixels_changed = 0
+          for y in range(270, 405):
+              for x in range(100, 303):
+                  r,g,b = image.getpixel((x,y))
+                  h,s,v = colorsys.rgb_to_hsv(r/255,g/255,b/255)
+                  if not (0.772 <= h <= 0.995):
+                      continue
+                  a = max(0,min(1,(s*255-45)/35))*max(0,min(1,(v*255-40)/45))
+                  if a < .03:
+                      continue
+                  rr,gg,bb=colorsys.hsv_to_rgb(.133,min(1,s*.9+.055),min(1,v*1.05+.016))
+                  changed.putpixel((x,y),(int(rr*255),int(gg*255),int(bb*255)))
+                  mask.putpixel((x,y),int(a*255))
+                  pixels_changed += 1
+          if pixels_changed < 700:
+              raise SystemExit('Expected pink petals were not found; refusing to alter image')
+          result=Image.composite(changed,image,mask.filter(ImageFilter.GaussianBlur(.65)))
+          result.save(file,quality=95,subsampling=0,optimize=True)
+          catalog=Path('puzzles.json')
+          items=json.loads(catalog.read_text())
+          assert len(items) == 75 and items[30]['title'] == 'Downtown Mobile Evening Cafe'
+          items[30]['targets']=[
+              {'x':0.439,'y':0.482,'r':0.099},
+              {'x':0.218,'y':0.365,'r':0.106},
+              {'x':0.406,'y':0.852,'r':0.095}
+          ]
+          catalog.write_text(json.dumps(items,indent=2)+'\n')
+          print('Yellow flower basket generated as third change; petals recolored:',pixels_changed)
+          PY
+      - name: Commit repaired image and puzzle targets
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add puzzles/p31b.jpg puzzles.json
+          if git diff --cached --quiet; then
+            echo 'No new changes.'
+          else
+            git commit -m 'Repair p31 with third flower-basket difference and accurate touch targets'
+            git push origin HEAD:main
+          fi
